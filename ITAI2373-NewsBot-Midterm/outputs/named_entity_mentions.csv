@@ -9581,7 +9581,7 @@ many years,DATE,586,596,Absolute or relative dates or periods,563,Technology,man
 eric tveter,PERSON,629,640,"People, including fictional",563,Technology,eric tveter
 philip snalune  director,PERSON,848,872,"People, including fictional",563,Technology,philip snalune director
 bristol,ORG,920,927,"Companies, agencies, institutions, etc.",563,Technology,bristol
-year,DATE,1066,1070,Absolute or relative dates or periods,563,Technology,year
+the year  the,DATE,1062,1075,Absolute or relative dates or periods,563,Technology,the year the
 1,MONEY,1155,1156,"Monetary values, including unit",563,Technology,1
 2,MONEY,1161,1162,"Monetary values, including unit",563,Technology,2
 3.50,MONEY,1187,1191,"Monetary values, including unit",563,Technology,3.50
