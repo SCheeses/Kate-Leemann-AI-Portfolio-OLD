@@ -73,7 +73,7 @@ The locally generated `test_predictions.csv` and `subject_verb_object_relationsh
 
 Kate Leemann and Roderick Taylor report equal, side-by-side collaboration with shared responsibilities rather than independently owned modules. Kate's individual contribution is participation in this shared development, execution, review, and documentation workflow; Roderick is credited as an equal collaborator. Each member should review the final materials before submission.
 
-The project adapts the instructor's starter notebook. OpenAI ChatGPT/Codex provided substantial code adaptation, debugging, explanations, and documentation assistance. The fictional examples and illustrative emotion lexicon were AI-assisted. This disclosure should be reviewed against the course's AI-use expectations.
+The project adapts the instructor's starter notebook. OpenAI ChatGPT/Codex provided substantial code adaptation, debugging, explanations, and documentation assistance. 
 
 ## References
 
