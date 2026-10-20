@@ -1,87 +1,108 @@
 # NewsBot Intelligence System
 
-**ITAI 2373 Midterm · TeamLeemannTaylor**  
-**Kate Leemann and Roderick Taylor**
+**ITAI 2373 Midterm | TeamLeemannTaylor | Kate Leemann and Roderick Taylor**
 
-[Portfolio repository](https://github.com/SCheeses/Kate-Leemann-AI-Portfolio) · [Working Colab notebook](https://colab.research.google.com/drive/1JVHzPeUvwiLKFz6JIM13lt9KGdJ2PEm0)
+[Portfolio repository](https://github.com/SCheeses/Kate-Leemann-AI-Portfolio)
 
-## Purpose
+## Status: post-submission correction
 
-A prototype for news editors and media-monitoring analysts: categorize articles, extract people and organizations, inspect textual sentiment, and explore linguistic patterns. Predictions support human review. Operational time savings and production readiness have not been established.
+The submitted notebook and its outputs are preserved in [`archive/submitted/`](archive/submitted/). The main notebook contains corrections made after submission. **The corrected notebook has been executed from start to finish with the supplied BBC CSV.** Both historical and fresh results are reported below.
 
-## Run in Google Colab
+NewsBot is a prototype for editors and media-monitoring analysts. It suggests a category, finds entity mentions, estimates textual sentiment, and exposes linguistic patterns for human review. It does not establish production readiness or operational time savings.
 
-1. Open `NewsBot_Intelligence_System.ipynb` in free Google Colab and save your own copy.
-2. Sign in to Kaggle and accept the applicable competition rules for the [BBC News Classification dataset](https://www.kaggle.com/competitions/learn-ai-bbc/data).
-3. Download and extract `BBC News Train.csv`. Upload it to Colab session storage so its path is `/content/BBC News Train.csv`.
-4. Run the notebook from the beginning. The setup cell installs dependencies and downloads the small spaCy model and NLTK resources. A CPU runtime is sufficient.
-5. Inspect outputs as the cells finish. The last code cell downloads `newsbot_outputs.zip`. Session files are temporary, so save your results before ending the runtime.
+## Run in Colab or VS Code/Jupyter
 
-No Kaggle API key is needed for this manual-download workflow. The dataset is not distributed in this repository. Individual users must obtain it from Kaggle under its applicable terms.
+1. Obtain `BBC News Train.csv` from the [BBC News Classification competition](https://www.kaggle.com/competitions/learn-ai-bbc/data), accepting its applicable terms. The source data is not redistributed here.
+2. Open `NewsBot_Intelligence_System.ipynb`. Put the CSV beside it, in `data/`, or in `/content/` on Colab. Alternatively set the `NEWSBOT_DATASET` environment variable to its absolute path.
+3. Run the notebook in order. The setup cell installs pinned core dependencies into the active kernel and downloads `en_core_web_sm` plus NLTK resources. A CPU runtime is sufficient. Restart the kernel if Jupyter requests it after installation, then run all cells.
+4. Review the generated metrics and plots in `outputs/`. The last cell creates `newsbot_outputs.zip`, excluding full-article prediction files and extracted source sentences. In Colab it also offers a download.
+
+For an existing local environment:
+
+```sh
+python -m pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+python -m nltk.downloader punkt punkt_tab stopwords wordnet vader_lexicon
+python tests/check_pipeline.py
+```
+
+Select that same Python environment as the notebook kernel. The model version used for the correction checks is `en_core_web_sm` 3.8.0.
 
 ## Dataset and evaluation
 
-The instructor-approved dataset contains 1,490 labeled articles. Removing 50 exact duplicate texts leaves 1,440 articles in Business, Entertainment, Politics, Sports, and Technology. Health is not represented. A stratified split reserves 288 articles for testing and 1,152 for training. Vocabulary fitting occurs within each training fold during three-fold cross-validation. Four TF-IDF configurations are compared for each algorithm.
+The submitted run loaded 1,490 labeled BBC articles. Removing 50 exact duplicate texts retained 1,440 articles across Business, Entertainment, Politics, Sports, and Technology. Health is unsupported. A stratified split reserved 288 test articles and 1,152 training articles. Vocabulary fitting occurred within each training fold during three-fold cross-validation.
 
-| Algorithm | Best CV macro F1 |
+| Submitted model | Best CV macro F1 |
 |---|---:|
 | Logistic Regression | 0.9749 |
-| Linear SVM | 0.9746 |
+| Linear-kernel SVM | 0.9746 |
 | Multinomial Naive Bayes | 0.9685 |
 
-Logistic Regression was selected using cross-validation. Held-out accuracy was **96.18% (277/288)** and macro F1 was **0.9598**. Technology had the lowest recall, **87.23%**. Gaming and technology-company coverage sometimes overlapped with Sports and Business. The small CV difference between Logistic Regression and SVM does not establish statistical superiority.
+The submitted Logistic Regression model achieved **96.18% accuracy (277/288)** and **0.9598 macro F1**. Technology recall was **87.23%**. These values are historical, not new measurements of the corrected preprocessing. The revised search additionally compares vocabulary limits of 2,000 and 5,000 terms. Because the old test set has already informed error analysis, a new independent dataset is needed for an unbiased assessment of improvements.
 
-## Module coverage
+### Corrected run
 
-| Module | Implementation |
-|---|---|
-| 1: Application context | Editorial routing and media-monitoring use case |
-| 2: Preprocessing | Cleaning, tokenization, stop words, basic lemmatization |
-| 3: TF-IDF | Vocabulary restriction, parameter comparison, term plots, classifier coefficients |
-| 4: POS | Article-level proportions and cross-category heatmap |
-| 5: Syntax | Dependency features, sentence diagram, simple active-voice relationship extraction |
-| 6: Sentiment/emotion | VADER plus an explicitly exploratory emotion-keyword baseline |
-| 7: Classification | Three algorithms, training-only tuning, held-out report and confusion matrix |
-| 8: NER | PERSON, ORG, GPE, DATE, MONEY; frequency and co-occurrence analysis |
+The corrected run selected **SVM** and achieved **97.57% accuracy (281/288)**, **0.9740 macro F1**, and **91.49% Technology recall** on the existing holdout. This is a post-submission regression comparison, not an untouched independent evaluation.
 
-The integrated class applies classification, sentiment, entities, emotion cues, POS, dependency relationships, and TF-IDF analysis to new inputs. Two fictional examples demonstrate functionality; they are not a real-news evaluation.
+| Model | Revised best CV macro F1 |
+|---|---:|
+| SVM | 0.9791 |
+| Logistic Regression | 0.9726 |
+| Naive Bayes | 0.9674 |
 
-## Selected findings
+SVM explanations report pairwise feature coefficients; these must not be treated as one coefficient row per category.
 
-- Technology had the highest median article length: 461.5 words.
-- Business had the highest number-token proportion (3.89%) and MONEY mentions per article (2.70).
-- Politics had the highest verb proportion (13.68%) and mean sentence length (22.45 tokens).
-- VADER labeled 80.23% of Entertainment articles positive; Politics had the largest negative-label share (46.62%).
-- Sports had the most PERSON mentions per article (7.32); Technology had the most ORG mentions (4.30).
-- Entity aliases remain unresolved: Tony Blair and Blair co-occurred in 51 articles.
+## Course and assignment alignment
 
-![Integrated results dashboard](outputs/newsbot_dashboard.png)
+| Assignment component | Course module | Implementation |
+|---|---|---|
+| 1: Context | 1 | Editorial routing and media monitoring |
+| 2: Preprocessing | 2 | HTML decoding, boundaries, contractions, tokenization, stop words, contextual lemmas |
+| 3: TF-IDF | 4 | N-grams, TF scaling, vocabulary-size comparison, term plots and coefficients |
+| 4: POS | 5 | Article-level proportions and category heatmap |
+| 5: Syntax/semantics | 6 | Dependencies, syntactic features, active SVO, candidate passive/active semantic roles |
+| 6: Sentiment/emotion | 7 | VADER and normalized exploratory emotion-keyword cues |
+| 7: Classification | 8 | Three models, training-only tuning, held-out report, confusion matrix |
+| 8: NER | 8 | PERSON, ORG, GPE, DATE, MONEY; frequencies and co-occurrence |
 
-## Limitations
+Course Module 3 covers audio; the explicit NewsBot assignment does not require audio processing. The starter's broader extension suggestions do not override the midterm's two required deliverables.
 
-This historical, single-publisher split does not establish performance on current news. Near-duplicate stories may remain. Lowercase source text reduces useful tagging clues. Basic preprocessing merges hyphenated words and does not fully handle contractions or HTML entities. Emotion cues use a small hand-selected, AI-assisted lexicon, not a validated emotion classifier. VADER, NER, and relationship extraction lack human-labeled accuracy evaluation. Co-occurrence is not evidence of an actual relationship. Model probabilities are not guarantees; unsupported categories still receive a known label. Human review is necessary.
+## Corrections and validation
 
-## Files
+- HTML removal and punctuation now preserve word boundaries; entities and contractions are normalized.
+- Contextual spaCy lemmatization replaces noun-only WordNet lemmatization. Classification keeps negation; sentiment, POS, syntax, and NER receive original text.
+- Headlines receive sentence-ending punctuation before the body to prevent merged grammatical subjects.
+- Candidate semantic roles demonstrate active/passive voice, recipients, and direct negation. A grammatical subject is explicitly not assumed to be a true agent.
+- Emotion dictionary entries and article words use the same lemma normalization.
+- Inputs with no known TF-IDF vocabulary are rejected rather than receiving an intercept-driven category.
+- Local paths, visible warnings, dependency pins, and portable ZIP export replace Colab-only assumptions.
+- `tests/check_pipeline.py` tests the notebook's actual definitions with synthetic fixtures. These checks are not accuracy benchmarks.
 
-- `NewsBot_Intelligence_System.ipynb`: executed notebook, explanations, and demonstration.
-- `outputs/`: charts, statistical tables, entity mentions, and fictional demo results.
-- Required team reflection: to be added after team review.
+See [`VALIDATION.md`](VALIDATION.md) for what was and was not verified.
 
-The locally generated `test_predictions.csv` and `subject_verb_object_relationships.csv` contain full articles or sentence excerpts and are omitted from this public file set. Notebook outputs retain limited illustrative excerpts. The raw and processed datasets are also excluded.
+## Deliverables
+
+- Main notebook: corrected implementation with fresh sequential execution outputs.
+- `archive/submitted/`: executed submission and historical result files.
+- `reports/NewsBot_Reflection_TeamLeemannTaylor.pdf`: exactly two pages; draft for both teammates to verify personal statements.
+- `reports/MT_Report_Group_TeamLeemannTaylor_Kate_Leemann_ITAI2373.pdf`: four-page technical report with a working repository link and explicit revision status.
+- Matching Markdown report sources for editing.
+- Optional video: not recorded. No video or bonus dashboard credit is claimed.
+
+## Limits and next evaluation
+
+The dataset is historical and single-publisher. Near-duplicate stories may remain. Lowercase source text limits linguistic cues. Unsupported topics still receive a known category unless their vocabulary is entirely unknown. Probability calibration has not been evaluated on independent news. VADER and NER have not been evaluated on human-labeled BBC examples. Emotion cues ignore negation and context. Semantic roles are heuristic candidates, not a trained SRL model; prepositional attachment, instruments, natural forces, pronouns, and quoted claims can be misinterpreted. Entity co-occurrence does not prove a real relationship, and aliases remain unresolved.
+
+Before deployment, label a representative sample, measure extraction and sentiment errors, evaluate on independent current news, and establish a human-review policy. The corrected score is measured on the existing holdout; independent validation remains future work.
 
 ## Contributions and assistance
 
-Kate Leemann and Roderick Taylor report equal, side-by-side collaboration with shared responsibilities rather than independently owned modules. Kate's individual contribution is participation in this shared development, execution, review, and documentation workflow; Roderick is credited as an equal collaborator. Each member should review the final materials before submission.
-
-The project adapts the instructor's starter notebook. OpenAI ChatGPT/Codex provided substantial code adaptation, debugging, explanations, and documentation assistance. 
+Kate Leemann and Roderick Taylor previously reported equal, side-by-side collaboration with shared responsibilities. Separate module ownership is not inferred. The reflection remains a team-review draft until both members verify their contributions and lessons. The post-submission corrections and report drafts were prepared with substantial OpenAI ChatGPT/Codex assistance.
 
 ## References
 
-- Instructor-provided ITAI 2373 NewsBot starter notebook and assignment instructions.
-- [BBC News Classification on Kaggle](https://www.kaggle.com/competitions/learn-ai-bbc/data)
-- [scikit-learn](https://scikit-learn.org/stable/)
-- [spaCy](https://spacy.io/usage)
-- [NLTK](https://www.nltk.org/)
-- [VADER](https://github.com/cjhutto/vaderSentiment)
-
-The optional video is not included.
+- Instructor-provided NewsBot assignment and `Midterm_NewsBot_Intelligence_System_student.ipynb`.
+- ITAI 2373 Modules 2, 4, 5, 6 (Syntax, Parsing, and Semantic Analysis), 7, and 8.
+- [BBC News Classification](https://www.kaggle.com/competitions/learn-ai-bbc/data)
+- [scikit-learn](https://scikit-learn.org/stable/), [spaCy](https://spacy.io/usage), [NLTK](https://www.nltk.org/)
+- [VADER](https://github.com/cjhutto/vaderSentiment), [contractions](https://github.com/kootenpv/contractions)
